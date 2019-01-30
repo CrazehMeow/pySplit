@@ -16,7 +16,8 @@
 
 # ##### Program start #####
 
-import sys, re
+import sys
+import re
 
 # todo: implement object storing the settings, refusing access if trying to set values more than once.
 
@@ -71,15 +72,15 @@ while x < len(args):
 
         if parameterName == "-b":
             mode_set += 2
-
-            if re.match("[0-9]+$", parameterValue) is not None:
-                bytes_per_file = int(re.match("[0-9]+", parameterValue).group())
+            bytes_number = int(re.match("[0-9]+", parameterValue).group())
+            if re.fullmatch("[0-9]+$", parameterValue) is not None:
+                bytes_per_file = bytes_number
             # regex 2: [0-9]+k
-            elif re.match("[0-9]+k$", parameterValue) is not None:
-                bytes_per_file = int(re.match("[0-9]+", parameterValue).group()) * 1024
+            elif re.fullmatch("[0-9]+k$", parameterValue) is not None:
+                bytes_per_file = bytes_number * 1024
             # regex 3: [0-9]+m
-            elif re.match("[0-9]+m$", parameterValue) is not None:
-                bytes_per_file = int(re.match("[0-9]+", parameterValue).group()) * 1038576
+            elif re.fullmatch("[0-9]+m$", parameterValue) is not None:
+                bytes_per_file = bytes_number * 1038576
             else:
                 print("split: invalid number of bytes:", parameterValue)
                 exit(1)
