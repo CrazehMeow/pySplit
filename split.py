@@ -16,7 +16,9 @@
 
 # ##### Program start #####
 
-import sys
+import sys, re
+
+# todo: implement object storing the settings, refusing access if trying to set values more than once.
 
 # default is 1000, modified by -l
 lines_per_file = 1000
@@ -37,7 +39,7 @@ suffix_length = 2
 print('Number of arguments:', len(sys.argv), 'arguments.')
 print('Argument List:', str(sys.argv))
 
-# 0 for default, 1 for lines, 2 for bytes, anything above = error
+# 0 for default lines, 1 for explicit lines, 2 for explicit bytes, anything above = error
 mode_set = 0
 
 
@@ -56,6 +58,7 @@ while x < len(args):
         if len(args) <= x+1:
             print("split: option requires an argument ", args[x])
             exit(1)
+
         parameterName = args[x]
         parameterValue = args[x+1]
 
@@ -68,28 +71,31 @@ while x < len(args):
 
         if parameterName == "-b":
             mode_set += 2
-            n, *size_token = parameterValue
-            is_size_token = False
-            print(n, size_token)
-            if len(size_token) > 0:
-                is_size_token = True
-                if len(size_token) == 1 and size_token[0] in ["k", "m"]:
-                    if size_token[0] == "k":
-                        size_token = 1024
-                    elif size_token[0] == "m":
-                        size_token = 1038576
-                else:
-                    print("split: invalid number of bytes:", parameterValue)
-                    exit(1)
+
+            if re.match("[0-9]+$", parameterValue) is not None:
+                bytes_per_file = int(re.match("[0-9]+", parameterValue).group())
+            # regex 2: [0-9]+k
+            elif re.match("[0-9]+k$", parameterValue) is not None:
+                bytes_per_file = int(re.match("[0-9]+", parameterValue).group()) * 1024
+            # regex 3: [0-9]+m
+            elif re.match("[0-9]+m$", parameterValue) is not None:
+                bytes_per_file = int(re.match("[0-9]+", parameterValue).group()) * 1038576
+            else:
+                print("split: invalid number of bytes:", parameterValue)
+                exit(1)
+
+        if parameterName == "-l":
+            mode_set += 1
             try:
-                n = int(n)
+                lines_per_file = int(parameterValue)
             except ValueError:
                 exit(1)
-            if is_size_token:
-                n = n * size_token
-            bytes_per_file = n
+
         # increment by two for args -a, -b, -l
         x += 2
+
+# start processing file
+# todo: implement
 
 print("---DEBUG---")
 print("mode_set is ", mode_set)
