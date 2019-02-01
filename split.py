@@ -108,7 +108,7 @@ while x < len(args):
 # start processing file
 
 
-def split_lines( input_file ):
+def split_lines(input_file):
     line_count = 0
     output_file_suffix = str(0).zfill(suffix_length)
     output_file = open(output_file_name + output_file_suffix, 'x')
@@ -128,20 +128,29 @@ def split_lines( input_file ):
     return
 
 
+def split_bytes(input_file):
+    bytes_value = input_file.read(bytes_per_file)
+    output_file_suffix = str(0).zfill(suffix_length)
+    while bytes_value != b"":
+        output_file = open(output_file_name + output_file_suffix, 'xb')
+        output_file.write(bytes_value)
+        output_file.close()
+        # input_file.seek(input_file.tell() + bytes_per_file)
+        bytes_value = input_file.read(bytes_per_file)
+        output_file_suffix = str(int(output_file_suffix) + 1).zfill(suffix_length)
+        if len(output_file_suffix) > suffix_length:
+            print("split: reached maximum possible number of files with suffix length of %d" % suffix_length)
+            exit(1)
+
+
 if input_file_name == "-":
     # use stdin
     print("Using stdin...")
 else:
     if split_mode == MODE_LINES:
         split_lines(open(input_file_name, 'r'))
-
     elif split_mode == MODE_BYTES:
-        print("Bytes")
-        #input_file = open(input_file_name, 'rb')
-        # f.tell() returns an integer giving the file object’s current position in the file represented as number of bytes from the beginning of the file when in binary mode and an opaque number when in text mode.
-    # output_file = open(output_file_name, 'x')
-
-
+        split_bytes(open(input_file_name, 'rb'))
 
 
 print("---DEBUG---")
