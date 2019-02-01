@@ -38,17 +38,10 @@ output_file_name = "x"
 # modified with -a
 suffix_length = 2
 
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
-
-# 0 for default lines, 1 for explicit lines, 2 for explicit bytes, anything above = error
-mode_set = 0
-
-
 # filter out program name reference
 _, *args = sys.argv
 
-if "-l" in args and "-b" in args:
+if "-l" in args and "-b" in args or args.count("-l") > 1 or args.count("-b") > 1:
     print("split: cannot split in more than one way")
     exit(1)
 
@@ -72,7 +65,6 @@ while x < len(args):
                 exit(1)
 
         if parameterName == "-b":
-            mode_set += 2
             bytes_number = int(re.match("[0-9]+", parameterValue).group())
             if re.fullmatch("[0-9]+$", parameterValue) is not None:
                 bytes_per_file = bytes_number
@@ -87,7 +79,6 @@ while x < len(args):
                 exit(1)
 
         if parameterName == "-l":
-            mode_set += 1
             try:
                 lines_per_file = int(parameterValue)
             except ValueError:
