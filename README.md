@@ -36,7 +36,11 @@ pySplit -b n[k|m] [-a suffix_length] [file [name]]
 ```
 
 -a        changes suffix length
+
 -b n      sets to pySplit into pieces of n bytes in size
+
 -b nk     sets to pySplit into pieces of n*1024 bytes in size (kb)
+
 -b nm     sets to pySplit into pieces of n*1038576 bytes in size (mb)
+
 -l        sets to pySplit into pieces of l lines
