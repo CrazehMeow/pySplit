@@ -58,7 +58,7 @@ while x < len(args):
     if args[x] in ["-a", '-b', '-l']:
         # test if there is an argument following the parameter
         if len(args) <= x+1:
-            print("split: option requires an argument ", args[x])
+            print("split: option requires an argument -- %s" % args[x][1])
             exit(1)
 
         parameterName = args[x]
@@ -101,7 +101,7 @@ while x < len(args):
         elif operand_count == 1:
             output_file_name = args[x]
         else:
-            print("split: extra operand 'name'")
+            print("split: extra operand '%s'" % (args[x]))
             exit(1)
         operand_count += 1
         x += 1
