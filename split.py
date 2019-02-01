@@ -165,8 +165,6 @@ if debug:
     print("input_file_name is ", input_file_name)
     print("output_file_name is ", output_file_name)
 
-# for incrementing chars, this is helpful https://stackoverflow.com/questions/2156892/python-how-can-i-increment-a-char
-
 # ##### Tallence/NEO requirements #####
 
 # 1. Über die Kommandozeile oder die Einstellungen der IDE gibt der Benutzer eine Datei und eine Anzahl Zeilen vor.
