@@ -10,8 +10,6 @@
 # -b nm     sets to pySplit into pieces of n*1038576 bytes in size (mb)
 # -l        sets to pySplit into pieces of l lines
 
-# STDOUT is not used
-# STDERR is used for diagnostic messages
 # EXIT CODE 0 for success, 1 for errors.
 
 # ##### Program start #####
@@ -43,6 +41,8 @@ output_file_name = "x"
 suffix_length = 2
 
 split_mode = MODE_LINES
+
+debug = False
 
 # filter out program name reference
 _, *args = sys.argv
@@ -144,22 +144,26 @@ def split_bytes(input_file):
 
 
 if input_file_name == "-":
-    # use stdin
-    print("Using stdin...")
+    if split_mode == MODE_LINES:
+        split_lines(sys.stdin)
+    elif split_mode == MODE_BYTES:
+        # todo test
+        split_bytes(sys.stdin)
+        print("split: byte mode not yet supported for stdin")
 else:
     if split_mode == MODE_LINES:
         split_lines(open(input_file_name, 'r'))
     elif split_mode == MODE_BYTES:
         split_bytes(open(input_file_name, 'rb'))
 
-
-print("---DEBUG---")
-print("mode_set is ", split_mode)
-print("suffix_length is", suffix_length)
-print("lines_per_file is", lines_per_file)
-print("bytes_per_file is", bytes_per_file)
-print("input_file_name is ", input_file_name)
-print("output_file_name is ", output_file_name)
+if debug:
+    print("---DEBUG---")
+    print("mode_set is ", split_mode)
+    print("suffix_length is", suffix_length)
+    print("lines_per_file is", lines_per_file)
+    print("bytes_per_file is", bytes_per_file)
+    print("input_file_name is ", input_file_name)
+    print("output_file_name is ", output_file_name)
 
 # for incrementing chars, this is helpful https://stackoverflow.com/questions/2156892/python-how-can-i-increment-a-char
 
@@ -167,5 +171,6 @@ print("output_file_name is ", output_file_name)
 
 # 1. Über die Kommandozeile oder die Einstellungen der IDE gibt der Benutzer eine Datei und eine Anzahl Zeilen vor.
 # 2. Start des Programms
-# 3. Das Programm teilt die Eingabedatei in mehrere Ausgabedateien auf, die jeweils die gewünschte Anzahl Zeilen enthalten.
+# 3. Das Programm teilt die Eingabedatei in mehrere Ausgabedateien auf,
+# die jeweils die gewünschte Anzahl Zeilen enthalten.
 # 4. Die Dateinamen enthalten eine fortlaufende Nummer
