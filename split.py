@@ -19,6 +19,10 @@
 import sys
 import re
 
+# constants
+MODE_LINES = 1
+MODE_BYTES = 2
+
 # default is 1000, modified by -l
 lines_per_file = 1000
 
@@ -37,6 +41,8 @@ output_file_name = "x"
 # default length is 2
 # modified with -a
 suffix_length = 2
+
+split_mode = MODE_LINES
 
 # filter out program name reference
 _, *args = sys.argv
@@ -65,6 +71,7 @@ while x < len(args):
                 exit(1)
 
         if parameterName == "-b":
+            split_mode = MODE_BYTES
             bytes_number = int(re.match("[0-9]+", parameterValue).group())
             if re.fullmatch("[0-9]+$", parameterValue) is not None:
                 bytes_per_file = bytes_number
@@ -79,6 +86,7 @@ while x < len(args):
                 exit(1)
 
         if parameterName == "-l":
+            split_mode = MODE_LINES
             try:
                 lines_per_file = int(parameterValue)
             except ValueError:
@@ -97,26 +105,43 @@ while x < len(args):
         operand_count += 1
         x += 1
 
-# todo check for legal mode
-
 # start processing file
 # todo: implement
+if input_file_name == "-":
+    # use stdin
+    print("Using stdin...")
+else:
+    if split_mode == MODE_LINES:
+        input_file = open(input_file_name, 'r')
+        line_count = 0
+        output_file_suffix = str(0).zfill(suffix_length)
+        output_file = open(output_file_name + output_file_suffix, 'x')
+        for line in input_file:
+            output_file.write(line)
+            line_count += 1
+            if line_count == lines_per_file:
+                line_count = 0
+                output_file.close()
+                output_file_suffix = str(int(output_file_suffix) + 1).zfill(suffix_length)
+                if len(output_file_suffix) > suffix_length:
+                    print("split: reached maximum possible number of files with suffix length of %d" % suffix_length)
+                    exit(1)
+                output_file = open(output_file_name + output_file_suffix, 'x')
+        output_file.close()
+        input_file.close()
+    elif split_mode == MODE_BYTES:
+        input_file = open(input_file_name, 'rb')
+        # f.tell() returns an integer giving the file object’s current position in the file represented as number of bytes from the beginning of the file when in binary mode and an opaque number when in text mode.
+    # output_file = open(output_file_name, 'x')
 
 
 print("---DEBUG---")
-print("mode_set is ", mode_set)
+print("mode_set is ", split_mode)
 print("suffix_length is", suffix_length)
 print("lines_per_file is", lines_per_file)
 print("bytes_per_file is", bytes_per_file)
 print("input_file_name is ", input_file_name)
 print("output_file_name is ", output_file_name)
-
-# iterate over arguments, analyze each argument and react accordingly.
-
-# debate: lookahead for tokens such as -a or -b or -l?
-
-# output file name prefix is always the last argument if it exists
-# input file name is always the last or second last argument if it exists
 
 # for incrementing chars, this is helpful https://stackoverflow.com/questions/2156892/python-how-can-i-increment-a-char
 
