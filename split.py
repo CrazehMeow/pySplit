@@ -12,28 +12,29 @@
 
 # STDOUT is not used
 # STDERR is used for diagnostic messages
-# EXIT CODE 0 for success, >0 for errors.
+# EXIT CODE 0 for success, 1 for errors.
 
 # ##### Program start #####
 
 import sys
 import re
 
-# todo: implement object storing the settings, refusing access if trying to set values more than once.
-
 # default is 1000, modified by -l
 lines_per_file = 1000
 
 # no default is set
-bytes_per_file = 0
+bytes_per_file = -1
+
+# counts operands that are not preceded by a '-'
+operand_count = 0
+
+# default of '-' signifies input from stdin
+input_file_name = "-"
 
 # default is x
 output_file_name = "x"
 
-# default length is 2, pattern is 'aa', 'ab' 'ac' etc. for a max of 676 files with a suffix length of 2.
-# If the suffix limit is exceeded, files up to the last allowed suffix are created and then pySplit fails.
-# If the suffix limit is not exceeded, the last created file contains the remainder of content from input.
-# If the input is empty, no output file is created. This is not an error.
+# default length is 2
 # modified with -a
 suffix_length = 2
 
@@ -94,16 +95,30 @@ while x < len(args):
 
         # increment by two for args -a, -b, -l
         x += 2
+    elif re.fullmatch("[a-zA-Z0-9_]*\\.?[a-zA-Z0-9]*", args[x]):
+        if operand_count == 0:
+            input_file_name = args[x]
+        elif operand_count == 1:
+            output_file_name = args[x]
+        else:
+            print("split: extra operand 'name'")
+            exit(1)
+        operand_count += 1
+        x += 1
+
+# todo check for legal mode
 
 # start processing file
 # todo: implement
+
 
 print("---DEBUG---")
 print("mode_set is ", mode_set)
 print("suffix_length is", suffix_length)
 print("lines_per_file is", lines_per_file)
 print("bytes_per_file is", bytes_per_file)
-
+print("input_file_name is ", input_file_name)
+print("output_file_name is ", output_file_name)
 
 # iterate over arguments, analyze each argument and react accordingly.
 
