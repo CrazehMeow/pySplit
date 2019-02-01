@@ -106,33 +106,42 @@ while x < len(args):
         x += 1
 
 # start processing file
-# todo: implement
+
+
+def split_lines( input_file ):
+    line_count = 0
+    output_file_suffix = str(0).zfill(suffix_length)
+    output_file = open(output_file_name + output_file_suffix, 'x')
+    for line in input_file:
+        output_file.write(line)
+        line_count += 1
+        if line_count == lines_per_file:
+            line_count = 0
+            output_file.close()
+            output_file_suffix = str(int(output_file_suffix) + 1).zfill(suffix_length)
+            if len(output_file_suffix) > suffix_length:
+                print("split: reached maximum possible number of files with suffix length of %d" % suffix_length)
+                exit(1)
+            output_file = open(output_file_name + output_file_suffix, 'x')
+    output_file.close()
+    input_file.close()
+    return
+
+
 if input_file_name == "-":
     # use stdin
     print("Using stdin...")
 else:
     if split_mode == MODE_LINES:
-        input_file = open(input_file_name, 'r')
-        line_count = 0
-        output_file_suffix = str(0).zfill(suffix_length)
-        output_file = open(output_file_name + output_file_suffix, 'x')
-        for line in input_file:
-            output_file.write(line)
-            line_count += 1
-            if line_count == lines_per_file:
-                line_count = 0
-                output_file.close()
-                output_file_suffix = str(int(output_file_suffix) + 1).zfill(suffix_length)
-                if len(output_file_suffix) > suffix_length:
-                    print("split: reached maximum possible number of files with suffix length of %d" % suffix_length)
-                    exit(1)
-                output_file = open(output_file_name + output_file_suffix, 'x')
-        output_file.close()
-        input_file.close()
+        split_lines(open(input_file_name, 'r'))
+
     elif split_mode == MODE_BYTES:
-        input_file = open(input_file_name, 'rb')
+        print("Bytes")
+        #input_file = open(input_file_name, 'rb')
         # f.tell() returns an integer giving the file object’s current position in the file represented as number of bytes from the beginning of the file when in binary mode and an opaque number when in text mode.
     # output_file = open(output_file_name, 'x')
+
+
 
 
 print("---DEBUG---")
