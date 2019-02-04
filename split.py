@@ -51,9 +51,10 @@ def pre_check():
 
 def parse_option_lines(value):
 		"""
-		Parses the value for the parameter option -l
+		Parses the value for the parameter option -l which represents the lines to split into each file.
+		This code will exit with error code 1 if the value was in the wrong format.
 		:param value: the numeric value representing the number of lines per file
-		:return: int representing lines per file, exits with code 1 if value was not numeric
+		:return: int representing lines per file
 		"""
 		try:
 				return int(value)
@@ -63,9 +64,10 @@ def parse_option_lines(value):
 
 def parse_option_bytes(value):
 		"""
-		Parses the value for the parameter option -b
+		Parses the value for the parameter option -b which represents the bytes to split into each file.
+		This code will exit with error code 1 if the value was in the wrong format.
 		:param value: contains a numeric value, optionally followed by k or m
-		:return: int representing bytes per file, exits with code 1 if value was wrong format
+		:return: int representing bytes per file
 		"""
 		bytes_number = int(re.match("[0-9]+", value).group())
 		if re.fullmatch("[0-9]+$", value) is not None:
@@ -82,7 +84,13 @@ def parse_option_bytes(value):
 
 
 def parse_option_suffix(value):
-		# check if value is numeric
+		"""
+		Parses the value for the parameter option -a which represents the suffix length.
+		The length is the number of digits that are appended to the file name.
+		This code will exit with error code 1 if the value was in the wrong format.
+		:param value: contains a numeric value
+		:return: int representing the suffix length
+		"""
 		try:
 				return int(value)
 		except ValueError:
@@ -90,6 +98,14 @@ def parse_option_suffix(value):
 
 
 def parse_options():
+		"""
+		Reads the command-line parameter options containing a hyphen and a letter an ending with the options value.
+		This method will also reduce the list of command-line parameters and return it as the remainder parameters.
+		If neither option -b or -l is provided, split defaults to lines with a default of 1000.
+		If option -a is not present, a default suffix length of 2 is used.
+		:return: A quadruple containing in this specific order: suffix length, lines per file,
+							bytes per file, remainder parameters
+		"""
 		args = get_arguments()
 		x = 0
 
@@ -135,7 +151,16 @@ def parse_options():
 
 
 def parse_operands(args):
-		# args = get_arguments()
+		"""
+		Reads the provided remainder of the command-line parameters, filtered from all options starting with a hyphen
+		and the corresponding value.
+		These operand parameters are read and used to assign the input file name and output file name.
+		If no input file name is present, the STDIN is used.
+		If no output file name is present, a default name of 'x' is used
+		:param args: the filtered command-line parameter list
+		:return: A triple containing the input file name (the file that is split), the output file name if provided or
+						the default of 'x'
+		"""
 		x = 0
 		operand_count = 0
 
@@ -157,7 +182,12 @@ def parse_operands(args):
 
 
 def parse_arguments():
-		# process command line arguments
+		"""
+		This method acts as a command-line interface. It will read the parameters and configure the program accordingly.
+		If any parameters on the command-line are malformed, execution will stop with the error code 1.
+		:return: A quintuple containing in this specific order: flag is split mode is line based, split length limit,
+						suffix length, input file name and output file name
+		"""
 		suffix_length, lines_per_file, bytes_per_file, remaining_args = parse_options()
 		input_file_name, output_file_name = parse_operands(remaining_args)
 
@@ -168,6 +198,12 @@ def parse_arguments():
 
 
 def validate_suffix_length(output_file_suffix, suffix_length):
+		"""
+		This method checks if the generated output file suffix is valid or if the number of digits dictated by
+		the suffix length have been exceeded.
+		:param output_file_suffix: The generated output file suffix
+		:param suffix_length: the number of digits available for the suffix
+		"""
 		if len(output_file_suffix) > suffix_length:
 				print("split: reached maximum possible number of files with suffix length of %d" % suffix_length)
 				exit(1)
@@ -175,13 +211,13 @@ def validate_suffix_length(output_file_suffix, suffix_length):
 
 def split_lines(lines_per_file, suffix_length, input_file, output_file_name):
 		"""
-				Writes the input_file to multiple output files with each file having lines_per_file lines.
-				File name is based on the output_file_name parameter.
-				A incrementing numeric suffix of suffix_length is appended to the output_file_name.
-				:param input_file: File to read from
-				:param suffix_length: Number of digits to add to each filename
-				:param lines_per_file: Number of lines each output file has
-				:param output_file_name: Output file name prefix
+		Writes the input_file to multiple output files with each file having lines_per_file lines.
+		File name is based on the output_file_name parameter.
+		A incrementing numeric suffix of suffix_length is appended to the output_file_name.
+		:param input_file: File to read from
+		:param suffix_length: Number of digits to add to each filename
+		:param lines_per_file: Number of lines each output file has
+		:param output_file_name: Output file name prefix
 		"""
 
 		output_file_suffix = str(0).zfill(suffix_length)
