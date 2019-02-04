@@ -49,12 +49,12 @@ def pre_check():
 				exit(1)
 
 
-def parse_option_lines(value):
+def parse_option_numeric_value(value):
 		"""
-		Parses the value for the parameter option -l which represents the lines to split into each file.
+		Parses the value for the numeric value following a parameter option.
 		This code will exit with error code 1 if the value was in the wrong format.
-		:param value: the numeric value representing the number of lines per file
-		:return: int representing lines per file
+		:param value: the parameter value from the command-line
+		:return: int representing the numeric value
 		"""
 		try:
 				return int(value)
@@ -69,7 +69,9 @@ def parse_option_bytes(value):
 		:param value: contains a numeric value, optionally followed by k or m
 		:return: int representing bytes per file
 		"""
-		bytes_number = int(re.match("[0-9]+", value).group())
+		bytes_number = re.match("[0-9]+", value)
+		if bytes_number is not None:
+				bytes_number = int(bytes_number.group())
 		if re.fullmatch("[0-9]+$", value) is not None:
 				return bytes_number
 		# regex 2: [0-9]+k
@@ -80,20 +82,6 @@ def parse_option_bytes(value):
 				return bytes_number * 1038576
 		else:
 				print("split: invalid number of bytes:", value)
-				exit(1)
-
-
-def parse_option_suffix(value):
-		"""
-		Parses the value for the parameter option -a which represents the suffix length.
-		The length is the number of digits that are appended to the file name.
-		This code will exit with error code 1 if the value was in the wrong format.
-		:param value: contains a numeric value
-		:return: int representing the suffix length
-		"""
-		try:
-				return int(value)
-		except ValueError:
 				exit(1)
 
 
@@ -127,13 +115,13 @@ def parse_options():
 						args.remove(parameter_value)
 
 						if parameter_name == "-a":
-								suffix_length = parse_option_suffix(parameter_value)
+								suffix_length = parse_option_numeric_value(parameter_value)
 
 						elif parameter_name == "-b":
 								bytes_per_file = parse_option_bytes(parameter_value)
 
 						elif parameter_name == "-l":
-								lines_per_file = parse_option_lines(parameter_value)
+								lines_per_file = parse_option_numeric_value(parameter_value)
 
 						# increment by two for args -a, -b, -l
 						x += 2
